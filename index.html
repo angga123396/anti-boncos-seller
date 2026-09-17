@@ -462,8 +462,9 @@ function hitung() {
     operasional +
     iklan;
 
-  const denominator =
-    1 - totalPersenFee - (targetProfit / 100);
+  const faktorDiskonAman = 1 - (diskon / 100);
+const denominator =
+  faktorDiskonAman * (1 - totalPersenFee - (targetProfit / 100));
 
   let hargaAman = 0;
 
