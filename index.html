@@ -342,7 +342,9 @@
     </p>
 
     <strong id="hargaAman">Rp0</strong>
-
+<p class="note">
+  Berdasarkan target laba: <strong id="infoTargetProfit">20%</strong>
+</p>
   </div>
 
 
@@ -497,7 +499,8 @@ if (faktorDiskon > 0 && faktorFee > 0) {
 
   document.getElementById('hargaAman').textContent =
     hargaAman > 0 ? rupiah(hargaAman) : 'Tidak dapat dihitung';
-
+document.getElementById("infoTargetProfit").textContent =
+  targetProfit.toFixed(2) + "%";
 document.getElementById("hargaBEP").textContent =
   hargaBEP > 0 ? rupiah(hargaBEP) : "Tidak dapat dihitung";
   // Status
