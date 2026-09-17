@@ -322,7 +322,16 @@
 
   </div>
 
+<div class="card">
+  <h2>💰 Harga Jual Minimal (BEP)</h2>
 
+  <p class="note">
+    Harga jual terendah agar setelah seluruh biaya diperhitungkan,
+    profit berada di titik impas (Rp0).
+  </p>
+
+  <strong id="hargaBEP">Rp0</strong>
+</div>
   <div class="card safe-price">
 
     <h2>🎯 Harga Jual Aman</h2>
@@ -456,7 +465,15 @@ function hitung() {
   if (denominator > 0) {
     hargaAman = biayaTetap / denominator;
   }
+// Harga jual minimal (BEP)
+const faktorDiskon = 1 - (diskon / 100);
+const faktorFee = 1 - totalPersenFee;
 
+let hargaBEP = 0;
+
+if (faktorDiskon > 0 && faktorFee > 0) {
+  hargaBEP = biayaTetap / (faktorDiskon * faktorFee);
+}
 
   // Tampilkan hasil
 
@@ -481,7 +498,8 @@ function hitung() {
   document.getElementById('hargaAman').textContent =
     hargaAman > 0 ? rupiah(hargaAman) : 'Tidak dapat dihitung';
 
-
+document.getElementById("hargaBEP").textContent =
+  hargaBEP > 0 ? rupiah(hargaBEP) : "Tidak dapat dihitung";
   // Status
 
   const status = document.getElementById('status');
