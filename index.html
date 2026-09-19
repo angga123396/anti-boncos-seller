@@ -212,32 +212,32 @@
 
       <div class="field">
         <label>Harga Modal</label>
-        <input type="number" id="modal" value="50000" oninput="hitung()">
+        <input type="number" id="modal" value="50000" min="0" oninput="hitung()">
       </div>
 
       <div class="field">
         <label>Harga Jual</label>
-        <input type="number" id="hargaJual" value="100000" oninput="hitung()">
+        <input type="number" id="hargaJual" value="100000" min="0" oninput="hitung()">
       </div>
 
       <div class="field">
         <label>Diskon / Voucher (%)</label>
-        <input type="number" id="diskon" value="0" oninput="hitung()">
+        <input type="number" id="diskon" value="0" min="0" max="100" oninput="hitung()">
       </div>
 
       <div class="field">
         <label>Biaya Packing</label>
-        <input type="number" id="packing" value="3000" oninput="hitung()">
+        <input type="number" id="packing" value="3000" min="0" oninput="hitung()">
       </div>
 
       <div class="field">
         <label>Biaya Operasional</label>
-        <input type="number" id="operasional" value="0" oninput="hitung()">
+        <input type="number" id="operasional" value="0" min="0" oninput="hitung()">
       </div>
 
       <div class="field">
         <label>Biaya Iklan</label>
-        <input type="number" id="iklan" value="0" oninput="hitung()">
+        <input type="number" id="iklan" value="0" min="0" oninput="hitung()">
       </div>
 
     </div>
@@ -257,22 +257,22 @@
 
       <div class="field">
         <label>Fee Marketplace (%)</label>
-        <input type="number" id="feeMarketplace" value="8" step="0.01" oninput="hitung()">
+        <input type="number" id="feeMarketplace" value="8" step="0.01" min="0" oninput="hitung()">
       </div>
 
       <div class="field">
         <label>Biaya Layanan / Program (%)</label>
-        <input type="number" id="feeLayanan" value="0" step="0.01" oninput="hitung()">
+        <input type="number" id="feeLayanan" value="0" step="0.01" min="0" oninput="hitung()">
       </div>
 
       <div class="field">
         <label>Biaya Lain (%)</label>
-        <input type="number" id="feeLain" value="0" step="0.01" oninput="hitung()">
+        <input type="number" id="feeLain" value="0" step="0.01" min="0" oninput="hitung()">
       </div>
 
       <div class="field">
         <label>Target Profit (%)</label>
-        <input type="number" id="targetProfit" value="20" step="0.01" oninput="hitung()">
+        <input type="number" id="targetProfit" value="20" min="0" step="0.01" oninput="hitung()">
       </div>
 
     </div>
