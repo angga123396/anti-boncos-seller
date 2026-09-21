@@ -480,7 +480,7 @@ function hitung() {
   // Status. Toleransi kecil mencegah angka pecahan sangat kecil salah terbaca.
   const status = document.getElementById('status');
   const profitCard = document.getElementById('hasilProfit').closest('.result');
-  const epsilon = 0.005;
+  const epsilon = 0.5;
 
   status.className = 'status';
   profitCard.classList.remove('profit', 'loss');
