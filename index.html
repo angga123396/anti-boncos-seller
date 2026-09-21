@@ -468,8 +468,8 @@ function hitung() {
   document.getElementById('hasilFee').textContent = rupiah(biayaMarketplace);
   document.getElementById('hasilTotalBiaya').textContent = rupiah(totalBiaya);
   document.getElementById('hasilBersih').textContent = rupiah(uangBersih);
-  document.getElementById('hasilProfit').textContent = rupiah(profit);
-  document.getElementById('hasilMargin').textContent = margin.toFixed(2) + '%';
+  document.getElementById('hasilProfit').textContent = rupiah(Math.abs(profit) < 0.5 ? 0 : profit);
+  document.getElementById('hasilMargin').textContent = (Math.abs(profit) < 0.5 ? 0 : margin).toFixed(2) + '%';
   document.getElementById('hargaBEP').textContent =
     hargaBEP !== null ? rupiah(hargaBEP) : 'Tidak dapat dihitung';
   document.getElementById('hargaAman').textContent =
