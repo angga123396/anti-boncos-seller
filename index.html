@@ -374,156 +374,106 @@
 
 
 <script>
-
 function rupiah(angka) {
+  if (!Number.isFinite(angka)) return 'Tidak dapat dihitung';
   return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    maximumFractionDigits: 0
-  }).format(angka || 0);
+    style: 'currency', currency: 'IDR', maximumFractionDigits: 0
+  }).format(angka);
 }
 
-
-function angka(id, min = 0, max = Infinity) {
+function bacaAngka(id, min = 0, max = Infinity) {
   const el = document.getElementById(id);
   let nilai = Number.parseFloat(el.value);
-
   if (!Number.isFinite(nilai)) nilai = 0;
-  nilai = Math.min(Math.max(nilai, min), max);
-
-  return nilai;
+  return Math.min(Math.max(nilai, min), max);
 }
 
+function normalisasiInput(id, min = 0, max = Infinity) {
+  const el = document.getElementById(id);
+  let nilai = Number.parseFloat(el.value);
+  if (!Number.isFinite(nilai)) nilai = 0;
+  nilai = Math.min(Math.max(nilai, min), max);
+  el.value = nilai;
+  hitung();
+}
 
 function hitung() {
+  const modal = bacaAngka('modal');
+  const hargaJual = bacaAngka('hargaJual');
+  const diskon = bacaAngka('diskon', 0, 100);
+  const packing = bacaAngka('packing');
+  const operasional = bacaAngka('operasional');
+  const iklan = bacaAngka('iklan');
+  const feeMarketplace = bacaAngka('feeMarketplace', 0, 100);
+  const feeLayanan = bacaAngka('feeLayanan', 0, 100);
+  const feeLain = bacaAngka('feeLain', 0, 100);
+  const targetProfit = bacaAngka('targetProfit', 0, 100);
 
-  const modal = angka('modal');
-  const hargaJual = angka('hargaJual');
-  const diskon = angka('diskon', 0, 100);
-
-  const packing = angka('packing');
-  const operasional = angka('operasional');
-  const iklan = angka('iklan');
-
-  const feeMarketplace = angka('feeMarketplace', 0, 100);
-  const feeLayanan = angka('feeLayanan', 0, 100);
-  const feeLain = angka('feeLain', 0, 100);
-  const targetProfit = angka('targetProfit', 0, 100);
-
-  // Harga setelah diskon
   const nilaiDiskon = hargaJual * (diskon / 100);
   const hargaSetelahDiskon = hargaJual - nilaiDiskon;
-
-  // Total persentase biaya marketplace
-  const totalPersenFee =
-    (feeMarketplace + feeLayanan + feeLain) / 100;
-
-  // Biaya marketplace
-  const biayaMarketplace =
-    hargaSetelahDiskon * totalPersenFee;
-
-  // Biaya tetap di luar fee marketplace
-  const biayaTetap =
-    modal + packing + operasional + iklan;
-
-  // Total seluruh biaya
+  const totalPersenFee = (feeMarketplace + feeLayanan + feeLain) / 100;
+  const biayaMarketplace = hargaSetelahDiskon * totalPersenFee;
+  const biayaTetap = modal + packing + operasional + iklan;
   const totalBiaya = biayaTetap + biayaMarketplace;
-
-  // Uang yang diterima seller setelah fee marketplace
   const uangBersih = hargaSetelahDiskon - biayaMarketplace;
-
-  // Profit bersih
   const profit = uangBersih - biayaTetap;
+  const margin = hargaSetelahDiskon > 0 ? (profit / hargaSetelahDiskon) * 100 : 0;
 
-  // Margin berdasarkan harga setelah diskon
-  const margin =
-    hargaSetelahDiskon > 0
-      ? (profit / hargaSetelahDiskon) * 100
-      : 0;
-
-  // Faktor perhitungan harga rekomendasi
-  const faktorDiskon = 1 - (diskon / 100);
+  const faktorDiskon = 1 - diskon / 100;
   const faktorFee = 1 - totalPersenFee;
-
-  // Harga jual minimal (BEP)
   let hargaBEP = null;
   if (faktorDiskon > 0 && faktorFee > 0) {
-    hargaBEP = biayaTetap / (faktorDiskon * faktorFee);
+    const hasil = biayaTetap / (faktorDiskon * faktorFee);
+    if (Number.isFinite(hasil) && hasil >= 0) hargaBEP = hasil;
   }
 
-  // Harga jual aman
-  // Target profit dihitung sebagai persentase dari harga setelah diskon.
-  const denominator =
-    faktorDiskon * (1 - totalPersenFee - (targetProfit / 100));
-
+  const denominator = faktorDiskon * (1 - totalPersenFee - targetProfit / 100);
   let hargaAman = null;
   if (denominator > 0) {
-    hargaAman = biayaTetap / denominator;
+    const hasil = biayaTetap / denominator;
+    if (Number.isFinite(hasil) && hasil >= 0) hargaAman = hasil;
   }
 
-  // Tampilkan hasil
-  document.getElementById('nilaiDiskon').textContent =
-    'Diskon: ' + rupiah(nilaiDiskon);
+  document.getElementById('nilaiDiskon').textContent = 'Diskon: ' + rupiah(nilaiDiskon);
   document.getElementById('hasilHarga').textContent = rupiah(hargaSetelahDiskon);
   document.getElementById('hasilFee').textContent = rupiah(biayaMarketplace);
   document.getElementById('hasilTotalBiaya').textContent = rupiah(totalBiaya);
   document.getElementById('hasilBersih').textContent = rupiah(uangBersih);
   document.getElementById('hasilProfit').textContent = rupiah(Math.abs(profit) < 0.5 ? 0 : profit);
   document.getElementById('hasilMargin').textContent = (Math.abs(profit) < 0.5 ? 0 : margin).toFixed(2) + '%';
-  document.getElementById('hargaBEP').textContent =
-    hargaBEP !== null ? rupiah(hargaBEP) : 'Tidak dapat dihitung';
-  document.getElementById('hargaAman').textContent =
-    hargaAman !== null ? rupiah(hargaAman) : 'Tidak dapat dihitung';
-  document.getElementById('infoTargetProfit').textContent =
-    targetProfit.toFixed(2) + '%';
+  document.getElementById('hargaBEP').textContent = hargaBEP !== null ? rupiah(hargaBEP) : 'Tidak dapat dihitung';
+  document.getElementById('hargaAman').textContent = hargaAman !== null ? rupiah(hargaAman) : 'Tidak dapat dihitung';
+  document.getElementById('infoTargetProfit').textContent = targetProfit.toFixed(2) + '%';
 
-  // Status. Toleransi kecil mencegah angka pecahan sangat kecil salah terbaca.
   const status = document.getElementById('status');
   const profitCard = document.getElementById('hasilProfit').closest('.result');
   const epsilon = 0.5;
-
   status.className = 'status';
   profitCard.classList.remove('profit', 'loss');
 
   if (profit > epsilon) {
-    status.classList.add('profit');
-    profitCard.classList.add('profit');
-    status.textContent = '✅ UNTUNG';
+    status.classList.add('profit'); profitCard.classList.add('profit'); status.textContent = '✅ UNTUNG';
   } else if (profit < -epsilon) {
-    status.classList.add('loss');
-    profitCard.classList.add('loss');
-    status.textContent = '⚠️ BONCOS';
+    status.classList.add('loss'); profitCard.classList.add('loss'); status.textContent = '⚠️ BONCOS';
   } else {
-    status.classList.add('break-even');
-    status.textContent = '⚖️ IMPAS';
+    status.classList.add('break-even'); status.textContent = '⚖️ IMPAS';
   }
 }
 
-
 function resetForm() {
-
-  document.getElementById('modal').value = 50000;
-  document.getElementById('hargaJual').value = 100000;
-
-  document.getElementById('diskon').value = 0;
-  document.getElementById('packing').value = 3000;
-
-  document.getElementById('operasional').value = 0;
-  document.getElementById('iklan').value = 0;
-
-  document.getElementById('feeMarketplace').value = 8;
-  document.getElementById('feeLayanan').value = 0;
-
-  document.getElementById('feeLain').value = 0;
-  document.getElementById('targetProfit').value = 20;
-
+  const defaults = {modal:50000,hargaJual:100000,diskon:0,packing:3000,operasional:0,iklan:0,feeMarketplace:8,feeLayanan:0,feeLain:0,targetProfit:20};
+  Object.entries(defaults).forEach(([id,nilai]) => document.getElementById(id).value = nilai);
   hitung();
-
 }
 
+['modal','hargaJual','packing','operasional','iklan'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => normalisasiInput(id, 0));
+});
+['diskon','feeMarketplace','feeLayanan','feeLain','targetProfit'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => normalisasiInput(id, 0, 100));
+});
 
 hitung();
-
 </script>
 
 </body>
