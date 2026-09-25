@@ -285,6 +285,20 @@
     .saved-box { margin-top:14px; padding:12px; border-radius:12px; background:#f5f4ff; font-size:13px; line-height:1.5; }
     .saved-box strong { display:block; margin-bottom:4px; }
     @media (max-width:650px) { .premium-actions { grid-template-columns:1fr; } }
+    .premium-lock { position:relative; }
+    .premium-lock.is-locked .premium-content { filter:blur(2px); opacity:.45; pointer-events:none; user-select:none; }
+    .lock-panel { display:none; margin-top:14px; padding:16px; border-radius:14px; background:#f5f4ff; border:1px solid #d9d5ff; text-align:center; }
+    .premium-lock.is-locked .lock-panel { display:block; }
+    .lock-panel strong { display:block; font-size:17px; margin-bottom:6px; }
+    .upgrade-button { background:#6d5dfc; }
+    .premium-note { margin:10px 0 0; font-size:12px; color:#666; }
+    .modal-backdrop { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.5); padding:18px; align-items:center; justify-content:center; }
+    .modal-backdrop.open { display:flex; }
+    .upgrade-modal { width:min(100%,460px); background:#fff; border-radius:18px; padding:22px; box-shadow:0 20px 60px rgba(0,0,0,.25); }
+    .upgrade-modal h2 { margin-top:0; }
+    .upgrade-list { padding-left:20px; line-height:1.7; }
+    .modal-actions { display:grid; gap:10px; margin-top:16px; }
+    .button.light { background:#ececf2; color:#222; }
 
   </style>
 </head>
@@ -295,8 +309,8 @@
 
   <div class="header">
     <h1>ANTI BONCOS SELLER</h1>
-    <p>Shopee Calculator Premium</p>
-    <span class="premium-badge">⭐ PREMIUM TOOLS AKTIF</span>
+    <p>Kalkulator Shopee — Gratis</p>
+    <span class="premium-badge" id="planBadge">FREE</span>
   </div>
 
   <div class="card">
@@ -443,19 +457,29 @@
   </div>
 
 
-  <div class="card premium-card">
+  <div class="card premium-card premium-lock is-locked" id="premiumArea">
     <div class="premium-title">
       <h2>⭐ Fitur Premium Seller</h2>
       <span>PRO</span>
     </div>
-    <p class="note">Simpan simulasi, bandingkan skenario, dan salin ringkasan hasil tanpa mengubah rumus kalkulator utama.</p>
-    <div class="premium-actions">
-      <button class="button premium" onclick="simpanSimulasi()">💾 Simpan Simulasi</button>
-      <button class="button secondary" onclick="salinRingkasan()">📋 Salin Ringkasan</button>
+    <p class="note">Fitur tambahan untuk menyimpan simulasi dan membagikan hasil perhitungan.</p>
+
+    <div class="lock-panel" id="lockPanel">
+      <strong>🔒 Fitur Premium terkunci</strong>
+      <div class="note">Kalkulator utama tetap gratis. Upgrade Premium untuk membuka Simpan Simulasi dan Salin Ringkasan.</div>
+      <button class="button upgrade-button" type="button" onclick="bukaUpgrade()">⭐ Upgrade Premium</button>
+      <p class="premium-note">Pembayaran akan disambungkan pada tahap berikutnya.</p>
     </div>
-    <div id="simulasiTersimpan" class="saved-box">
-      <strong>Simulasi tersimpan</strong>
-      Belum ada simulasi.
+
+    <div class="premium-content">
+      <div class="premium-actions">
+        <button class="button premium" onclick="simpanSimulasi()">💾 Simpan Simulasi</button>
+        <button class="button secondary" onclick="salinRingkasan()">📋 Salin Ringkasan</button>
+      </div>
+      <div id="simulasiTersimpan" class="saved-box">
+        <strong>Simulasi tersimpan</strong>
+        Belum ada simulasi.
+      </div>
     </div>
   </div>
 
@@ -475,6 +499,23 @@
 
   </div>
 
+
+
+  <div class="modal-backdrop" id="upgradeModal" role="dialog" aria-modal="true" aria-labelledby="upgradeTitle">
+    <div class="upgrade-modal">
+      <h2 id="upgradeTitle">⭐ Upgrade Premium</h2>
+      <p class="note">Versi gratis tetap dapat menggunakan kalkulator utama.</p>
+      <ul class="upgrade-list">
+        <li>Simpan simulasi perhitungan</li>
+        <li>Salin ringkasan hasil dengan cepat</li>
+        <li>Akses fitur Premium Seller</li>
+      </ul>
+      <div class="modal-actions">
+        <button class="button upgrade-button" type="button" onclick="infoPembayaran()">Lanjut Upgrade</button>
+        <button class="button light" type="button" onclick="tutupUpgrade()">Nanti Saja</button>
+      </div>
+    </div>
+  </div>
 
   <div class="footer">
     ANTI BONCOS SELLER © 2026
@@ -610,6 +651,40 @@ function hitung() {
 }
 
 
+
+// === FREE / PREMIUM ACCESS ===
+// Default publik = FREE. Jangan menyimpan akses Premium di localStorage:
+// akses berbayar nanti harus diverifikasi oleh sistem pembayaran/backend.
+let premiumAktif = false;
+
+function terapkanAksesPremium() {
+  const area = document.getElementById('premiumArea');
+  const badge = document.getElementById('planBadge');
+  if (!area || !badge) return;
+
+  area.classList.toggle('is-locked', !premiumAktif);
+  badge.textContent = premiumAktif ? '⭐ PREMIUM AKTIF' : 'FREE';
+}
+
+function bukaUpgrade() {
+  document.getElementById('upgradeModal').classList.add('open');
+}
+
+function tutupUpgrade() {
+  document.getElementById('upgradeModal').classList.remove('open');
+}
+
+function infoPembayaran() {
+  alert('Tahap berikutnya: sambungkan pembayaran agar akses Premium terbuka otomatis setelah pembayaran berhasil.');
+}
+
+function wajibPremium() {
+  if (premiumAktif) return true;
+  bukaUpgrade();
+  return false;
+}
+
+
 function dataSimulasi() {
   return {
     modal: angka('modal'), hargaJual: angka('hargaJual'), diskon: angka('diskon',0,100),
@@ -627,6 +702,7 @@ function dataSimulasi() {
 }
 
 function simpanSimulasi() {
+  if (!wajibPremium()) return;
   const d = dataSimulasi();
   localStorage.setItem('antiBoncosSimulasi', JSON.stringify(d));
   tampilkanSimulasi();
@@ -645,6 +721,7 @@ function tampilkanSimulasi() {
 }
 
 async function salinRingkasan() {
+  if (!wajibPremium()) return;
   const d = dataSimulasi();
   const teks = [
     'ANTI BONCOS SELLER - Ringkasan Simulasi',
@@ -690,6 +767,7 @@ function resetForm() {
 
 
 hitung();
+terapkanAksesPremium();
 tampilkanSimulasi();
 
 </script>
