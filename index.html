@@ -273,6 +273,19 @@
       .header h1 { font-size: 22px; }
     }
 
+
+    /* === PREMIUM FEATURES === */
+    .premium-badge { display:inline-block; margin-top:10px; padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.18); font-size:12px; font-weight:bold; }
+    .premium-card { border:2px solid #6d5dfc; background:linear-gradient(180deg,#fff,#f8f7ff); }
+    .premium-title { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .premium-title span { font-size:12px; padding:5px 9px; border-radius:999px; background:#6d5dfc; color:#fff; }
+    .premium-actions { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:14px; }
+    .button.secondary { background:#222; }
+    .button.premium { background:#6d5dfc; }
+    .saved-box { margin-top:14px; padding:12px; border-radius:12px; background:#f5f4ff; font-size:13px; line-height:1.5; }
+    .saved-box strong { display:block; margin-bottom:4px; }
+    @media (max-width:650px) { .premium-actions { grid-template-columns:1fr; } }
+
   </style>
 </head>
 
@@ -283,6 +296,7 @@
   <div class="header">
     <h1>ANTI BONCOS SELLER</h1>
     <p>Shopee Calculator Premium</p>
+    <span class="premium-badge">⭐ PREMIUM TOOLS AKTIF</span>
   </div>
 
   <div class="card">
@@ -428,6 +442,22 @@
 </p>
   </div>
 
+
+  <div class="card premium-card">
+    <div class="premium-title">
+      <h2>⭐ Fitur Premium Seller</h2>
+      <span>PRO</span>
+    </div>
+    <p class="note">Simpan simulasi, bandingkan skenario, dan salin ringkasan hasil tanpa mengubah rumus kalkulator utama.</p>
+    <div class="premium-actions">
+      <button class="button premium" onclick="simpanSimulasi()">💾 Simpan Simulasi</button>
+      <button class="button secondary" onclick="salinRingkasan()">📋 Salin Ringkasan</button>
+    </div>
+    <div id="simulasiTersimpan" class="saved-box">
+      <strong>Simulasi tersimpan</strong>
+      Belum ada simulasi.
+    </div>
+  </div>
 
   <div class="card">
 
@@ -580,6 +610,63 @@ function hitung() {
 }
 
 
+function dataSimulasi() {
+  return {
+    modal: angka('modal'), hargaJual: angka('hargaJual'), diskon: angka('diskon',0,100),
+    packing: angka('packing'), operasional: angka('operasional'), iklan: angka('iklan'),
+    feeMarketplace: angka('feeMarketplace',0,100), feeLayanan: angka('feeLayanan',0,100),
+    feeLain: angka('feeLain',0,100), targetProfit: angka('targetProfit',0,100),
+    hargaSetelahDiskon: document.getElementById('hasilHarga').textContent,
+    totalBiaya: document.getElementById('hasilTotalBiaya').textContent,
+    profit: document.getElementById('hasilProfit').textContent,
+    margin: document.getElementById('hasilMargin').textContent,
+    bep: document.getElementById('hargaBEP').textContent,
+    hargaAman: document.getElementById('hargaAman').textContent,
+    status: document.getElementById('status').textContent.trim()
+  };
+}
+
+function simpanSimulasi() {
+  const d = dataSimulasi();
+  localStorage.setItem('antiBoncosSimulasi', JSON.stringify(d));
+  tampilkanSimulasi();
+}
+
+function tampilkanSimulasi() {
+  const box = document.getElementById('simulasiTersimpan');
+  if (!box) return;
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem('antiBoncosSimulasi')); } catch(e) {}
+  if (!d) { box.innerHTML = '<strong>Simulasi tersimpan</strong>Belum ada simulasi.'; return; }
+  box.innerHTML = '<strong>Simulasi terakhir</strong>' +
+    'Harga jual: ' + rupiah(d.hargaJual) + ' · Diskon: ' + d.diskon.toFixed(2) + '%<br>' +
+    'Profit: ' + d.profit + ' · Margin: ' + d.margin + '<br>' +
+    'BEP: ' + d.bep + ' · Harga aman: ' + d.hargaAman + '<br>' + d.status;
+}
+
+async function salinRingkasan() {
+  const d = dataSimulasi();
+  const teks = [
+    'ANTI BONCOS SELLER - Ringkasan Simulasi',
+    'Harga Jual: ' + rupiah(d.hargaJual),
+    'Diskon: ' + d.diskon.toFixed(2) + '%',
+    'Harga Setelah Diskon: ' + d.hargaSetelahDiskon,
+    'Total Biaya: ' + d.totalBiaya,
+    'Profit Bersih: ' + d.profit,
+    'Margin Profit: ' + d.margin,
+    'BEP: ' + d.bep,
+    'Harga Jual Aman: ' + d.hargaAman,
+    'Status: ' + d.status
+  ].join('\n');
+  try {
+    await navigator.clipboard.writeText(teks);
+    alert('Ringkasan berhasil disalin.');
+  } catch(e) {
+    window.prompt('Salin ringkasan berikut:', teks);
+  }
+}
+
+
 function resetForm() {
 
   document.getElementById('modal').value = 50000;
@@ -603,6 +690,7 @@ function resetForm() {
 
 
 hitung();
+tampilkanSimulasi();
 
 </script>
 
