@@ -300,7 +300,36 @@
     .modal-actions { display:grid; gap:10px; margin-top:16px; }
     .button.light { background:#ececf2; color:#222; }
 
-  </style>
+  
+    /* === PREMIUM COMPLETE SUITE === */
+    .pro-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:14px; }
+    .pro-tool { border:1px solid #e4e7ec; border-radius:14px; padding:15px; background:#fff; }
+    .pro-tool h3 { margin:0 0 8px; font-size:16px; }
+    .pro-tool.full { grid-column:1/-1; }
+    .mini-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .mini-grid.three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    .mini-grid input, .mini-grid select, .pro-tool select { width:100%; min-height:44px; padding:10px; border:1px solid #ddd; border-radius:10px; font-size:15px; background:#fff; }
+    .pro-label { display:block; font-size:12px; font-weight:700; margin:8px 0 5px; color:#444; }
+    .tool-button { width:100%; border:0; padding:11px 12px; border-radius:10px; font-weight:700; cursor:pointer; margin-top:10px; background:#6d5dfc; color:#fff; }
+    .tool-button.dark { background:#22263a; }
+    .tool-button.light { background:#ececf4; color:#222; }
+    .tool-output { margin-top:10px; padding:11px; border-radius:10px; background:#f7f7fb; font-size:13px; line-height:1.55; overflow-wrap:anywhere; }
+    .table-wrap { overflow-x:auto; margin-top:10px; }
+    .pro-table { width:100%; border-collapse:collapse; min-width:600px; font-size:13px; }
+    .pro-table th,.pro-table td { padding:9px; border-bottom:1px solid #eee; text-align:right; }
+    .pro-table th:first-child,.pro-table td:first-child { text-align:left; }
+    .risk-list { margin:8px 0 0; padding-left:18px; line-height:1.55; }
+    .risk-ok { color:#16803c; font-weight:700; }
+    .risk-warn { color:#a05b00; font-weight:700; }
+    .risk-danger { color:#c62828; font-weight:700; }
+    .history-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .history-actions button { flex:1 1 150px; }
+    @media(max-width:650px){
+      .pro-grid,.mini-grid,.mini-grid.three { grid-template-columns:1fr; }
+      .pro-tool.full { grid-column:auto; }
+    }
+
+</style>
 </head>
 
 <body>
@@ -459,26 +488,87 @@
 
   <div class="card premium-card premium-lock is-locked" id="premiumArea">
     <div class="premium-title">
-      <h2>⭐ Fitur Premium Seller</h2>
+      <h2>⭐ Premium Seller Suite</h2>
       <span>PRO</span>
     </div>
-    <p class="note">Fitur tambahan untuk menyimpan simulasi dan membagikan hasil perhitungan.</p>
+    <p class="note">Alat simulasi lanjutan untuk menguji harga, diskon, iklan, target profit, dan beberapa skenario sebelum seller mengambil keputusan.</p>
 
     <div class="lock-panel" id="lockPanel">
-      <strong>🔒 Fitur Premium terkunci</strong>
-      <div class="note">Kalkulator utama tetap gratis. Upgrade Premium untuk membuka Simpan Simulasi dan Salin Ringkasan.</div>
-      <button class="button upgrade-button" type="button" onclick="bukaUpgrade()">⭐ Upgrade Premium</button>
-      <p class="premium-note">Pembayaran akan disambungkan pada tahap berikutnya.</p>
+      <strong>🔒 8 fitur Premium terkunci</strong>
+      <div class="note">Kalkulator utama tetap GRATIS. Upgrade Premium untuk membuka seluruh simulator dan riwayat.</div>
+      <button class="button upgrade-button" type="button" onclick="bukaUpgrade()">⭐ Lihat Fitur Premium</button>
+      <p class="premium-note">Pembayaran akan disambungkan setelah paket Premium lolos tes.</p>
     </div>
 
     <div class="premium-content">
-      <div class="premium-actions">
-        <button class="button premium" onclick="simpanSimulasi()">💾 Simpan Simulasi</button>
-        <button class="button secondary" onclick="salinRingkasan()">📋 Salin Ringkasan</button>
-      </div>
-      <div id="simulasiTersimpan" class="saved-box">
-        <strong>Simulasi tersimpan</strong>
-        Belum ada simulasi.
+      <div class="pro-grid">
+
+        <section class="pro-tool full">
+          <h3>📊 Simulator Skenario Harga</h3>
+          <div class="mini-grid three">
+            <div><label class="pro-label">Harga A</label><input id="scenarioA" type="number" min="0" value="79900"></div>
+            <div><label class="pro-label">Harga B</label><input id="scenarioB" type="number" min="0" value="89900"></div>
+            <div><label class="pro-label">Harga C</label><input id="scenarioC" type="number" min="0" value="99900"></div>
+          </div>
+          <button class="tool-button" type="button" onclick="bandingkanSkenario()">Bandingkan 3 Skenario</button>
+          <div id="scenarioOutput" class="tool-output">Masukkan tiga harga jual untuk dibandingkan.</div>
+        </section>
+
+        <section class="pro-tool">
+          <h3>🎯 Target Profit Otomatis</h3>
+          <label class="pro-label">Mode target</label>
+          <select id="targetMode">
+            <option value="rupiah">Target profit (Rp)</option>
+            <option value="persen">Target margin (%)</option>
+          </select>
+          <label class="pro-label">Nilai target</label>
+          <input id="targetValue" type="number" min="0" step="0.01" value="20000">
+          <button class="tool-button" type="button" onclick="hitungTargetOtomatis()">Hitung Harga Jual</button>
+          <div id="targetOutput" class="tool-output">Contoh: target profit Rp20.000 atau margin 25%.</div>
+        </section>
+
+        <section class="pro-tool">
+          <h3>📢 Simulator Biaya Iklan</h3>
+          <label class="pro-label">Profit minimum yang ingin dipertahankan (Rp)</label>
+          <input id="minProfitAds" type="number" min="0" value="0">
+          <button class="tool-button" type="button" onclick="hitungBatasIklan()">Hitung Batas Iklan</button>
+          <div id="adsOutput" class="tool-output">Menunjukkan estimasi biaya iklan maksimum agar target profit minimum masih tercapai.</div>
+        </section>
+
+        <section class="pro-tool full">
+          <h3>🏷️ Simulator Diskon / Voucher</h3>
+          <button class="tool-button" type="button" onclick="simulasiDiskon()">Uji Diskon 5% • 10% • 15% • 20%</button>
+          <div id="discountOutput" class="tool-output">Gunakan harga jual dan biaya dari kalkulator utama.</div>
+        </section>
+
+        <section class="pro-tool">
+          <h3>🛍️ Multi-Marketplace</h3>
+          <label class="pro-label">Preset</label>
+          <select id="marketPreset" onchange="pilihMarketplace()">
+            <option value="custom">Custom / gunakan fee saat ini</option>
+            <option value="shopee">Shopee — contoh preset</option>
+            <option value="tiktok">TikTok Shop — contoh preset</option>
+            <option value="tokopedia">Tokopedia — contoh preset</option>
+          </select>
+          <div id="marketOutput" class="tool-output">Preset hanya titik awal dan tetap dapat diedit. Cek tarif aktual akun/toko sebelum digunakan.</div>
+        </section>
+
+        <section class="pro-tool">
+          <h3>🚨 Peringatan Risiko Boncos</h3>
+          <button class="tool-button" type="button" onclick="analisisRisiko()">Analisis Risiko Sekarang</button>
+          <div id="riskOutput" class="tool-output">Menganalisis diskon, total fee, margin, dan kelayakan target profit.</div>
+        </section>
+
+        <section class="pro-tool full">
+          <h3>📚 Riwayat & Perbandingan Simulasi</h3>
+          <div class="history-actions">
+            <button class="tool-button" type="button" onclick="simpanKeRiwayat()">💾 Simpan Hasil Saat Ini</button>
+            <button class="tool-button dark" type="button" onclick="salinRingkasan()">📋 Salin / Bagikan Ringkasan</button>
+            <button class="tool-button light" type="button" onclick="hapusRiwayat()">Hapus Riwayat</button>
+          </div>
+          <div id="historyOutput" class="tool-output">Belum ada simulasi tersimpan.</div>
+        </section>
+
       </div>
     </div>
   </div>
@@ -506,9 +596,14 @@
       <h2 id="upgradeTitle">⭐ Upgrade Premium</h2>
       <p class="note">Versi gratis tetap dapat menggunakan kalkulator utama.</p>
       <ul class="upgrade-list">
-        <li>Simpan simulasi perhitungan</li>
-        <li>Salin ringkasan hasil dengan cepat</li>
-        <li>Akses fitur Premium Seller</li>
+        <li>Simulator 3 skenario harga</li>
+        <li>Target profit otomatis (Rp atau %)</li>
+        <li>Simulator diskon 5–20%</li>
+        <li>Batas aman biaya iklan</li>
+        <li>Preset multi-marketplace yang tetap bisa diedit</li>
+        <li>Riwayat & perbandingan simulasi</li>
+        <li>Peringatan risiko boncos</li>
+        <li>Salin / bagikan ringkasan</li>
       </ul>
       <div class="modal-actions">
         <button class="button upgrade-button" type="button" onclick="infoPembayaran()">Lanjut Upgrade</button>
@@ -685,6 +780,167 @@ function wajibPremium() {
 }
 
 
+
+// === PREMIUM COMPLETE SUITE ===
+function currentInputs(overrides = {}) {
+  return {
+    modal: overrides.modal ?? angka('modal'),
+    hargaJual: overrides.hargaJual ?? angka('hargaJual'),
+    diskon: overrides.diskon ?? angka('diskon', 0, 100),
+    packing: overrides.packing ?? angka('packing'),
+    operasional: overrides.operasional ?? angka('operasional'),
+    iklan: overrides.iklan ?? angka('iklan'),
+    feeMarketplace: overrides.feeMarketplace ?? angka('feeMarketplace', 0, 100),
+    feeLayanan: overrides.feeLayanan ?? angka('feeLayanan', 0, 100),
+    feeLain: overrides.feeLain ?? angka('feeLain', 0, 100),
+    targetProfit: overrides.targetProfit ?? angka('targetProfit', 0, 100)
+  };
+}
+
+function calcSnapshot(x) {
+  const biayaTetap = x.modal + x.packing + x.operasional + x.iklan;
+  const faktorDiskon = 1 - x.diskon / 100;
+  const totalFeePct = (x.feeMarketplace + x.feeLayanan + x.feeLain) / 100;
+  const netRate = 1 - totalFeePct;
+  const hargaSetelahDiskon = x.hargaJual * faktorDiskon;
+  const biayaMarketplace = hargaSetelahDiskon * totalFeePct;
+  const uangBersih = hargaSetelahDiskon - biayaMarketplace;
+  const profit = uangBersih - biayaTetap;
+  const margin = hargaSetelahDiskon > 0 ? profit / hargaSetelahDiskon * 100 : 0;
+  const bepDen = faktorDiskon * netRate;
+  const hargaBEP = bepDen > 0 ? biayaTetap / bepDen : null;
+  const amanDen = faktorDiskon * (netRate - x.targetProfit / 100);
+  const hargaAman = amanDen > 0 ? biayaTetap / amanDen : null;
+  return { ...x, biayaTetap, faktorDiskon, totalFeePct, netRate, hargaSetelahDiskon, biayaMarketplace, uangBersih, profit, margin, hargaBEP, hargaAman };
+}
+
+function rp0(n) { return rupiah(Number.isFinite(n) ? n : 0); }
+function pct(n) { return Number.isFinite(n) ? n.toFixed(2) + '%' : '-'; }
+function statusSnap(s) { return s.profit > 0.5 ? 'UNTUNG' : s.profit < -0.5 ? 'BONCOS' : 'IMPAS'; }
+
+function bandingkanSkenario() {
+  if (!wajibPremium()) return;
+  const harga = ['scenarioA','scenarioB','scenarioC'].map(id => Math.max(0, Number(document.getElementById(id).value) || 0));
+  const rows = harga.map((h,i) => calcSnapshot(currentInputs({hargaJual:h})));
+  document.getElementById('scenarioOutput').innerHTML =
+    '<div class="table-wrap"><table class="pro-table"><thead><tr><th>Skenario</th><th>Harga</th><th>Profit</th><th>Margin</th><th>Status</th></tr></thead><tbody>' +
+    rows.map((s,i)=>`<tr><td>${String.fromCharCode(65+i)}</td><td>${rp0(s.hargaJual)}</td><td>${rp0(s.profit)}</td><td>${pct(s.margin)}</td><td>${statusSnap(s)}</td></tr>`).join('') +
+    '</tbody></table></div>';
+}
+
+function hitungTargetOtomatis() {
+  if (!wajibPremium()) return;
+  const mode = document.getElementById('targetMode').value;
+  const target = Math.max(0, Number(document.getElementById('targetValue').value) || 0);
+  const x = currentInputs();
+  const biayaTetap = x.modal + x.packing + x.operasional + x.iklan;
+  const faktorDiskon = 1 - x.diskon / 100;
+  const netRate = 1 - (x.feeMarketplace + x.feeLayanan + x.feeLain) / 100;
+  let harga = null;
+  if (mode === 'rupiah') {
+    const den = faktorDiskon * netRate;
+    if (den > 0) harga = (biayaTetap + target) / den;
+  } else {
+    const den = faktorDiskon * (netRate - target / 100);
+    if (den > 0) harga = biayaTetap / den;
+  }
+  document.getElementById('targetOutput').innerHTML = harga !== null
+    ? `<strong>Harga jual yang dibutuhkan: ${rp0(harga)}</strong><br><span class="note">Perhitungan memakai diskon dan fee yang sedang terisi.</span>`
+    : '<span class="risk-danger">Target tidak dapat dicapai dengan kombinasi fee/diskon tersebut.</span>';
+}
+
+function simulasiDiskon() {
+  if (!wajibPremium()) return;
+  const diskonList = [5,10,15,20];
+  const rows = diskonList.map(d => calcSnapshot(currentInputs({diskon:d})));
+  document.getElementById('discountOutput').innerHTML =
+    '<div class="table-wrap"><table class="pro-table"><thead><tr><th>Diskon</th><th>Harga Neto</th><th>Profit</th><th>Margin</th><th>Status</th></tr></thead><tbody>' +
+    rows.map(s=>`<tr><td>${s.diskon}%</td><td>${rp0(s.hargaSetelahDiskon)}</td><td>${rp0(s.profit)}</td><td>${pct(s.margin)}</td><td>${statusSnap(s)}</td></tr>`).join('') +
+    '</tbody></table></div>';
+}
+
+function hitungBatasIklan() {
+  if (!wajibPremium()) return;
+  const minProfit = Math.max(0, Number(document.getElementById('minProfitAds').value) || 0);
+  const x = currentInputs({iklan:0});
+  const s = calcSnapshot(x);
+  const batas = s.uangBersih - (x.modal + x.packing + x.operasional) - minProfit;
+  document.getElementById('adsOutput').innerHTML = batas >= 0
+    ? `<strong>Estimasi biaya iklan maksimum: ${rp0(batas)}</strong><br><span class="note">Agar profit minimal ${rp0(minProfit)} masih tercapai pada input saat ini.</span>`
+    : `<span class="risk-danger">Tidak ada ruang biaya iklan. Bahkan tanpa iklan, target profit minimum belum tercapai.</span>`;
+}
+
+const MARKET_PRESETS = {
+  shopee: {feeMarketplace:8, feeLayanan:0, feeLain:0, label:'Shopee'},
+  tiktok: {feeMarketplace:8, feeLayanan:0, feeLain:0, label:'TikTok Shop'},
+  tokopedia: {feeMarketplace:8, feeLayanan:0, feeLain:0, label:'Tokopedia'}
+};
+
+function pilihMarketplace() {
+  if (!wajibPremium()) { document.getElementById('marketPreset').value='custom'; return; }
+  const key = document.getElementById('marketPreset').value;
+  if (key === 'custom') {
+    document.getElementById('marketOutput').textContent = 'Mode custom: fee utama tetap memakai angka yang kamu isi sendiri.';
+    return;
+  }
+  const p = MARKET_PRESETS[key];
+  document.getElementById('feeMarketplace').value = p.feeMarketplace;
+  document.getElementById('feeLayanan').value = p.feeLayanan;
+  document.getElementById('feeLain').value = p.feeLain;
+  hitung();
+  document.getElementById('marketOutput').innerHTML =
+    `<strong>${p.label} dipilih.</strong><br>Contoh fee diisi ${p.feeMarketplace}% + layanan ${p.feeLayanan}% + lain ${p.feeLain}%. <strong>Tetap cek dan edit sesuai tarif aktual akun/toko.</strong>`;
+}
+
+function analisisRisiko() {
+  if (!wajibPremium()) return;
+  const s = calcSnapshot(currentInputs());
+  const risks = [];
+  if (s.diskon >= 20) risks.push(['risk-warn','Diskon 20% atau lebih: cek kembali ruang margin.']);
+  if (s.totalFeePct >= 0.20) risks.push(['risk-warn','Total fee 20% atau lebih: beban marketplace tinggi.']);
+  if (s.profit < -0.5) risks.push(['risk-danger','Input saat ini menghasilkan BONCOS.']);
+  else if (s.margin < 5) risks.push(['risk-warn','Margin di bawah 5%: ruang untuk perubahan biaya sangat tipis.']);
+  if (s.hargaAman === null) risks.push(['risk-danger','Target profit tidak mungkin dihitung karena target + fee terlalu tinggi.']);
+  if (!risks.length) risks.push(['risk-ok','Tidak ada peringatan utama dari aturan pemeriksaan dasar saat ini.']);
+  document.getElementById('riskOutput').innerHTML =
+    '<ul class="risk-list">' + risks.map(([c,t])=>`<li class="${c}">${t}</li>`).join('') + '</ul>';
+}
+
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem('absPremiumHistory') || '[]'); }
+  catch(e) { return []; }
+}
+
+function simpanKeRiwayat() {
+  if (!wajibPremium()) return;
+  const s = calcSnapshot(currentInputs());
+  const history = getHistory();
+  history.unshift({
+    waktu: new Date().toLocaleString('id-ID'),
+    hargaJual:s.hargaJual, diskon:s.diskon, profit:s.profit, margin:s.margin,
+    bep:s.hargaBEP, aman:s.hargaAman, status:statusSnap(s)
+  });
+  localStorage.setItem('absPremiumHistory', JSON.stringify(history.slice(0,10)));
+  tampilkanRiwayat();
+}
+
+function tampilkanRiwayat() {
+  const el = document.getElementById('historyOutput');
+  if (!el) return;
+  const h = getHistory();
+  if (!h.length) { el.textContent = 'Belum ada simulasi tersimpan.'; return; }
+  el.innerHTML = '<div class="table-wrap"><table class="pro-table"><thead><tr><th>Waktu</th><th>Harga</th><th>Diskon</th><th>Profit</th><th>Margin</th><th>Status</th></tr></thead><tbody>' +
+    h.map(x=>`<tr><td>${x.waktu}</td><td>${rp0(x.hargaJual)}</td><td>${Number(x.diskon).toFixed(2)}%</td><td>${rp0(x.profit)}</td><td>${pct(x.margin)}</td><td>${x.status}</td></tr>`).join('') +
+    '</tbody></table></div>';
+}
+
+function hapusRiwayat() {
+  if (!wajibPremium()) return;
+  localStorage.removeItem('absPremiumHistory');
+  tampilkanRiwayat();
+}
+
+
 function dataSimulasi() {
   return {
     modal: angka('modal'), hargaJual: angka('hargaJual'), diskon: angka('diskon',0,100),
@@ -706,6 +962,7 @@ function simpanSimulasi() {
   const d = dataSimulasi();
   localStorage.setItem('antiBoncosSimulasi', JSON.stringify(d));
   tampilkanSimulasi();
+tampilkanRiwayat();
 }
 
 function tampilkanSimulasi() {
@@ -769,6 +1026,7 @@ function resetForm() {
 hitung();
 terapkanAksesPremium();
 tampilkanSimulasi();
+tampilkanRiwayat();
 
 </script>
 
