@@ -301,6 +301,11 @@
     .button.light { background:#ececf2; color:#222; }
 
   
+    /* === ADMIN TEST MODE === */
+    .admin-test-bar { margin:0 0 14px; padding:12px; border:1px dashed #8b7cff; border-radius:12px; background:#f7f5ff; text-align:center; }
+    .admin-test-bar button { border:0; border-radius:10px; padding:10px 14px; font-weight:700; cursor:pointer; background:#22263a; color:#fff; }
+    .admin-test-bar small { display:block; margin-top:7px; color:#666; }
+
     /* === PREMIUM COMPLETE SUITE === */
     .pro-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:14px; }
     .pro-tool { border:1px solid #e4e7ec; border-radius:14px; padding:15px; background:#fff; }
@@ -485,6 +490,12 @@
 </p>
   </div>
 
+
+  <div class="admin-test-bar" id="adminTestBar">
+    <strong>🧪 Mode Tes Admin</strong>
+    <button type="button" id="adminTestButton" onclick="toggleAdminTest()">Buka Premium untuk Tes</button>
+    <small>Hanya untuk pengujian sementara sebelum sistem pembayaran dipasang.</small>
+  </div>
 
   <div class="card premium-card premium-lock is-locked" id="premiumArea">
     <div class="premium-title">
@@ -750,15 +761,36 @@ function hitung() {
 // === FREE / PREMIUM ACCESS ===
 // Default publik = FREE. Jangan menyimpan akses Premium di localStorage:
 // akses berbayar nanti harus diverifikasi oleh sistem pembayaran/backend.
-let premiumAktif = false;
+let premiumAktif = sessionStorage.getItem('absAdminTestPremium') === '1';
 
 function terapkanAksesPremium() {
   const area = document.getElementById('premiumArea');
   const badge = document.getElementById('planBadge');
+  const btn = document.getElementById('adminTestButton');
   if (!area || !badge) return;
 
   area.classList.toggle('is-locked', !premiumAktif);
-  badge.textContent = premiumAktif ? '⭐ PREMIUM AKTIF' : 'FREE';
+  badge.textContent = premiumAktif ? '🧪 PREMIUM TEST' : 'FREE';
+
+  if (btn) {
+    btn.textContent = premiumAktif ? 'Tutup Mode Tes Premium' : 'Buka Premium untuk Tes';
+  }
+}
+
+function toggleAdminTest() {
+  premiumAktif = !premiumAktif;
+
+  if (premiumAktif) {
+    sessionStorage.setItem('absAdminTestPremium', '1');
+  } else {
+    sessionStorage.removeItem('absAdminTestPremium');
+  }
+
+  terapkanAksesPremium();
+
+  if (premiumAktif) {
+    document.getElementById('premiumArea').scrollIntoView({behavior:'smooth', block:'start'});
+  }
 }
 
 function bukaUpgrade() {
