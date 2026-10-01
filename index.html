@@ -784,19 +784,51 @@ function infoPembayaran() {
   }
 }
 
-function aktivasiPremium() {
+async function aktivasiPremium() {
   const input = document.getElementById('activationCode');
   const msg = document.getElementById('activationMessage');
-  const code = (input?.value || '').trim();
+  const button = input?.parentElement?.querySelector('button.premium');
+  const code = (input?.value || '').trim().toUpperCase();
 
   if (!code) {
     msg.textContent = 'Masukkan kode aktivasi setelah pembayaran diverifikasi.';
     return;
   }
 
-  // Keamanan: kode tidak divalidasi di frontend.
-  // Endpoint verifikasi server akan dipasang pada tahap aktivasi backend.
-  msg.textContent = 'Kode belum dapat diverifikasi otomatis. Aktivasi server belum terhubung.';
+  if (button) button.disabled = true;
+  msg.textContent = 'Memverifikasi kode aktivasi...';
+
+  try {
+    const response = await fetch('https://anti-boncos-activation.erlanggaalafghani0.workers.dev/activate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({code})
+    });
+
+    let data = {};
+    try { data = await response.json(); } catch (_) {}
+
+    if (!response.ok || data.ok !== true || data.premium !== true) {
+      msg.textContent = data.message || 'Kode aktivasi tidak valid.';
+      return;
+    }
+
+    localStorage.setItem('absPremiumActive', '1');
+    premiumAktif = true;
+    terapkanAksesPremium();
+    msg.textContent = data.message || 'Premium berhasil diaktifkan.';
+    input.value = '';
+
+    setTimeout(() => {
+      tutupUpgrade();
+      document.getElementById('premiumArea')?.scrollIntoView({behavior:'smooth', block:'start'});
+    }, 700);
+  } catch (error) {
+    console.error('Activation request failed:', error);
+    msg.textContent = 'Tidak dapat terhubung ke server aktivasi. Coba lagi.';
+  } finally {
+    if (button) button.disabled = false;
+  }
 }
 
 function wajibPremium() {
