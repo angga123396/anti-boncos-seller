@@ -294,7 +294,7 @@
     .premium-note { margin:10px 0 0; font-size:12px; color:#666; }
     .modal-backdrop { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.5); padding:18px; align-items:center; justify-content:center; }
     .modal-backdrop.open { display:flex; }
-    .upgrade-modal { width:min(100%,460px); background:#fff; border-radius:18px; padding:22px; box-shadow:0 20px 60px rgba(0,0,0,.25); }
+    .upgrade-modal { width:min(100%,460px); max-height:calc(100vh - 36px); overflow-y:auto; background:#fff; border-radius:18px; padding:22px; box-shadow:0 20px 60px rgba(0,0,0,.25); }
     .upgrade-modal h2 { margin-top:0; }
     .upgrade-list { padding-left:20px; line-height:1.7; }
     .modal-actions { display:grid; gap:10px; margin-top:16px; }
